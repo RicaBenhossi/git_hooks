@@ -1,0 +1,61 @@
+#!/bin/sh
+
+have_forbidden_tags() {
+
+    local return_tag_found=1;
+
+
+    for tag in ${forbidden_tags[*]}; do
+        have_tag=$(git diff | grep *$tag* | wc -l)
+        have_tag_cached=$(git diff --cached | grep $tag | wc -l)
+
+        if [[ $have_tag != 0 || $have_tag_cached != 0 ]]; then
+            return_tag_found=0
+            break
+        fi
+    done
+
+    if [[ $return_tag_found == 0 ]]; then
+        echo true
+    else
+        echo false
+    fi
+}
+
+
+sigla_dev=$(git config user.sigladev)
+branch=`git branch | grep '^\*' | cut -b3-`
+forbidden_tags=("DEBUG" "WIP")
+forbidden_tag_found=false
+
+if [[ $file =~ ".pas$" ]]; then
+    # CHECK IF THERE IS FOBIDDEN TAGS IN REVISION
+    forbidden_tag_found=$(have_forbidden_tags)
+    if [[ $forbidden_tag_found = true ]]; then
+        tag_list=''
+        for tag in ${forbidden_tags[*]}; do
+            if [[ -n $tag_list ]]; then
+                tag_list="$tag_list, "
+            fi
+            tag_list="$tag_list$tag"
+        done
+        echo
+        echo "******************************************************************************************"
+        echo "*                                                                                        *"
+        echo "*   THERE IS SOME FORBIDDEN TAGS IN YOUR CODE. COMMITING WITH THIS TAGs IS NOT ALLOWED   *"
+        echo "*                                                                                        *"
+        echo "******************************************************************************************"
+        echo
+        echo "Tags $tag_list must be removed from your code."
+        exit 1
+    fi
+fi
+
+
+if [[ $branch != *"rebasing"* ]]; then
+    FILE=`cat "$1"`
+    if [[ $branch != *"$SIGLA_DEV"* ]]; then
+        branch=$branch" "$SIGLA_DEV
+    fi
+    echo "$branch: $FILE" > "$1"
+fi
