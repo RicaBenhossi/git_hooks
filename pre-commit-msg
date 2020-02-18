@@ -3,9 +3,9 @@
 find vendor -name ".git*" -type d | while read i
 do
     if [[ -d $i ]]; then
-        DIR=`dirname $i`
+        directory=`dirname $i`
         rm -fR $i
-        git rm -r --cached $DIR > /dev/null 2>&1
-        git add $DIR > /dev/null 2>&1
+        git rm -r --cached $directory > /dev/null 2>&1
+        git add $directory > /dev/null 2>&1
     fi
 done

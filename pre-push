@@ -1,15 +1,16 @@
 #!/bin/sh
 
-directory_inspecao='/l/fnt/INSPECAO_CHAMADOS'
+# Check it the push directory is the same of $directory_pushing. If it is, doesn't allow it.
+directory_pushing='/l/fnt/INSPECAO_CHAMADOS'
 actual_directory=$(dirname "$(pwd)")
 
-if [ $actual_directory = $directory_inspecao ]; then
+if [ $actual_directory = $directory_pushing ]; then
     echo
-    echo "****************************************************************************"
-    echo "*                                                                          *"
-    echo "*   PUSH IS NOT ALLOWED. THIS DIRECTORY IS ONLY FOR INSPECTION ANALISYS.   *"
-    echo "*                                                                          *"
-    echo "****************************************************************************"
+    echo "************************************************************************"
+    echo "*                                                                      *"
+    echo "*   PUSH IS NOT ALLOWED. THIS DIRECTORY IS EXCLUSIVELY FOR ANALISYS.   *"
+    echo "*                                                                      *"
+    echo "************************************************************************"
     echo
     exit 1
 else

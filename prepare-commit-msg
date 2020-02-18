@@ -25,35 +25,37 @@ have_forbidden_tags() {
 
 sigla_dev=$(git config user.sigladev)
 branch=`git branch | grep '^\*' | cut -b3-`
+# Tag or terms you do not want in your code.
 forbidden_tags=("DEBUG" "WIP")
 forbidden_tag_found=false
 
-if [[ $file =~ ".pas$" ]]; then
-    # CHECK IF THERE IS FOBIDDEN TAGS IN REVISION
-    forbidden_tag_found=$(have_forbidden_tags)
-    if [[ $forbidden_tag_found = true ]]; then
-        tag_list=''
-        for tag in ${forbidden_tags[*]}; do
-            if [[ -n $tag_list ]]; then
-                tag_list="$tag_list, "
-            fi
-            tag_list="$tag_list$tag"
-        done
-        echo
-        echo "******************************************************************************************"
-        echo "*                                                                                        *"
-        echo "*   THERE IS SOME FORBIDDEN TAGS IN YOUR CODE. COMMITING WITH THIS TAGs IS NOT ALLOWED   *"
-        echo "*                                                                                        *"
-        echo "******************************************************************************************"
-        echo
-        echo "Tags $tag_list must be removed from your code."
-        exit 1
-    fi
+
+# Check if there is fobidden tags in revision
+forbidden_tag_found=$(have_forbidden_tags)
+if [[ $forbidden_tag_found = true ]]; then
+    tag_list=''
+    for tag in ${forbidden_tags[*]}; do
+        if [[ -n $tag_list ]]; then
+            tag_list="$tag_list, "
+        fi
+        tag_list="$tag_list$tag"
+    done
+    echo
+    echo "******************************************************************************************"
+    echo "*                                                                                        *"
+    echo "*   THERE IS SOME FORBIDDEN TAGS IN YOUR CODE. COMMITING WITH THIS TAGs IS NOT ALLOWED   *"
+    echo "*                                                                                        *"
+    echo "******************************************************************************************"
+    echo
+    echo "Tags $tag_list must be removed from your code."
+    exit 1
 fi
 
-
+# Check whether $branch does not contain 'rebasing'. That indicates a rebasing operation and, in this case, there is no branch.
 if [[ $branch != *"rebasing"* ]]; then
     FILE=`cat "$1"`
+
+    # Check if branch name has not the Dev Initials. If true add a space between branch name and Dev Initials.
     if [[ $branch != *"$SIGLA_DEV"* ]]; then
         branch=$branch" "$SIGLA_DEV
     fi
