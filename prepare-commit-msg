@@ -56,8 +56,8 @@ if [[ $branch != *"rebasing"* ]]; then
     FILE=`cat "$1"`
 
     # Check if branch name has not the Dev Initials. If true add a space between branch name and Dev Initials.
-    if [[ $branch != *"$SIGLA_DEV"* ]]; then
-        branch=$branch" "$SIGLA_DEV
+    if [[ $branch != *"$sigla_dev"* ]]; then
+        branch=$branch" "$sigla_dev
     fi
     echo "$branch: $FILE" > "$1"
 fi
