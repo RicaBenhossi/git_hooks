@@ -30,13 +30,13 @@ lista_tags_proibidas=("DEBUG" "WIP")
 commit_possui_tags_proibidas=false
 
 
-# Checa se as alterações que serão comitadas possuiem a tag/termos proibidos.
-# Se tiver barra o commit
+# Checa se as alterações que serão comitadas possuem a tag/termos proibidos.
+# Se tiver, barra o commit
 commit_possui_tags_proibidas=$(possui_tags_proibidas)
 if [[ $commit_possui_tags_proibidas = true ]]; then
     tags_cadastradas=''
 
-    # Monta um string com as tags separadas por virgula.
+    # Monta um string com as tags cadastradas separadas por vírgula somente para exibição.
     for tag in ${lista_tags_proibidas[*]}; do
         if [[ -n $tags_cadastradas ]]; then
             tags_cadastradas="$tags_cadastradas, "
@@ -54,13 +54,14 @@ if [[ $commit_possui_tags_proibidas = true ]]; then
     exit 1
 fi
 
-# Checa se a $branch contém a palavra 'rebasing'.
-# Isso indica que um rebase está em execução e, nesse caso, não possui uma branch.
+# Checa se a a variável $branch contém a palavra 'rebasing'.
+# Isso indica que um rebase está em execução e, nesse caso, o HEAD não tem uma branch.
+# Nesse cenário, não tem será adicionado o nome da branch no começo da mensagem do commit.
 if [[ $branch != *"rebasing"* ]]; then
     arquivo=`cat "$1"`
 
-    # Checa se no nome da branch NãO possui as iniciais do desenvolvedor
-    # Se não possui, não é uma branch comum de chamado (master, test, fix) e só adiciona um " " + sigla
+    # Checa se no nome da branch NÃO possui as iniciais do desenvolvedor
+    # Se não possui, não é uma branch de chamado. Nesse caso adiciona "nome_da_branch sigla"
     if [[ $branch != *"$sigla_dev"* ]]; then
         branch=$branch" "$sigla_dev
     fi
