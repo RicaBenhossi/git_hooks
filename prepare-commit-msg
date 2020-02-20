@@ -1,21 +1,21 @@
 #!/bin/sh
 
-have_forbidden_tags() {
+possui_tags_proibidas() {
 
-    local return_tag_found=1;
+    local encontrou_tag_proibida=1
 
 
-    for tag in ${forbidden_tags[*]}; do
-        have_tag=$(git diff | grep *$tag* | wc -l)
-        have_tag_cached=$(git diff --cached | grep $tag | wc -l)
+    for tag in ${lista_tags_proibidas[*]}; do
+        git_diff_possui_tag_proibida=$(git diff | grep *$tag* | wc -l)
+        git_diff_cached_possui_tag_proibida=$(git diff --cached | grep $tag | wc -l)
 
-        if [[ $have_tag != 0 || $have_tag_cached != 0 ]]; then
-            return_tag_found=0
+        if [[ $git_diff_possui_tag_proibida != 0 || $git_diff_cached_possui_tag_proibida != 0 ]]; then
+            encontrou_tag_proibida=0
             break
         fi
     done
 
-    if [[ $return_tag_found == 0 ]]; then
+    if [[ $encontrou_tag_proibida == 0 ]]; then
         echo true
     else
         echo false
@@ -25,39 +25,46 @@ have_forbidden_tags() {
 
 sigla_dev=$(git config user.sigladev)
 branch=`git branch | grep '^\*' | cut -b3-`
-# Tag or terms you do not want in your code.
-forbidden_tags=("DEBUG" "WIP")
-forbidden_tag_found=false
+# Tag ou termos que você não quer que existam no código
+lista_tags_proibidas=("DEBUG" "WIP")
+commit_possui_tags_proibidas=false
 
 
-# Check if there is fobidden tags in revision
-forbidden_tag_found=$(have_forbidden_tags)
-if [[ $forbidden_tag_found = true ]]; then
-    tag_list=''
-    for tag in ${forbidden_tags[*]}; do
-        if [[ -n $tag_list ]]; then
-            tag_list="$tag_list, "
+# Checa se as alterações que serão comitadas possuiem a tag/termos proibidos.
+# Se tiver barra o commit
+commit_possui_tags_proibidas=$(possui_tags_proibidas)
+if [[ $commit_possui_tags_proibidas = true ]]; then
+    tags_cadastradas=''
+
+    # Monta um string com as tags separadas por virgula.
+    for tag in ${lista_tags_proibidas[*]}; do
+        if [[ -n $tags_cadastradas ]]; then
+            tags_cadastradas="$tags_cadastradas, "
         fi
-        tag_list="$tag_list$tag"
+        tags_cadastradas="$tags_cadastradas$tag"
     done
     echo
-    echo "******************************************************************************************"
-    echo "*                                                                                        *"
-    echo "*   THERE IS SOME FORBIDDEN TAGS IN YOUR CODE. COMMITING WITH THIS TAGs IS NOT ALLOWED   *"
-    echo "*                                                                                        *"
-    echo "******************************************************************************************"
+    echo "********************************************************************************************"
+    echo "*                                                                                          *"
+    echo "*   SUAS ALTERAÇÕES POSSUEM TAGS/TERMOS PROIBIDOS. RETIRE-AS PARA PODER EXECUTAR O COMMIT  *"
+    echo "*                                                                                          *"
+    echo "********************************************************************************************"
     echo
-    echo "Tags $tag_list must be removed from your code."
+    echo "As tags/termos $tags_cadastradas precisam ser removidas do seu código."
     exit 1
 fi
 
-# Check whether $branch does not contain 'rebasing'. That indicates a rebasing operation and, in this case, there is no branch.
+# Checa se a $branch contém a palavra 'rebasing'.
+# Isso indica que um rebase está em execução e, nesse caso, não possui uma branch.
 if [[ $branch != *"rebasing"* ]]; then
-    FILE=`cat "$1"`
+    arquivo=`cat "$1"`
 
-    # Check if branch name has not the Dev Initials. If true add a space between branch name and Dev Initials.
-    if [[ $branch != *"$SIGLA_DEV"* ]]; then
-        branch=$branch" "$SIGLA_DEV
+    # Checa se no nome da branch NãO possui as iniciais do desenvolvedor
+    # Se não possui, não é uma branch comum de chamado (master, test, fix) e só adiciona um " " + sigla
+    if [[ $branch != *"$sigla_dev"* ]]; then
+        branch=$branch" "$sigla_dev
     fi
-    echo "$branch: $FILE" > "$1"
+
+    # Adiciona o nome da branch no começo da mensagem do commit.
+    echo "$branch: $arquivo" > "$1"
 fi
