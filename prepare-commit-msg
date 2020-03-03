@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 possui_tags_proibidas(){
 
