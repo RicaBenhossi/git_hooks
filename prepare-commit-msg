@@ -27,6 +27,7 @@ branch=$(git branch | grep '^\*' | cut -b3-)
 lista_tags_proibidas=("DEBUG" "WIP")
 commit_possui_tags_proibidas=false
 echo $sigla_dev
+echo $branch
 
 # Checa se as alterações que serão comitadas possuem a tag/termos proibidos.
 # Se tiver, barra o commit
