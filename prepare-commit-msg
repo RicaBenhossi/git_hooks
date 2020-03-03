@@ -1,10 +1,8 @@
-#!/bin/sh
+#!/bin/bash
 
-possui_tags_proibidas() {
+possui_tags_proibidas(){
 
-    local encontrou_tag_proibida=1
-
-
+    encontrou_tag_proibida=1
     for tag in ${lista_tags_proibidas[*]}; do
         git_diff_possui_tag_proibida=$(git diff | grep *$tag* | wc -l)
         git_diff_cached_possui_tag_proibida=$(git diff --cached | grep $tag | wc -l)
@@ -28,7 +26,7 @@ branch=`git branch | grep '^\*' | cut -b3-`
 # Tag ou termos que você não quer que existam no código
 lista_tags_proibidas=("DEBUG" "WIP")
 commit_possui_tags_proibidas=false
-
+echo $sigla_dev
 
 # Checa se as alterações que serão comitadas possuem a tag/termos proibidos.
 # Se tiver, barra o commit

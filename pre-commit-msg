@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 find vendor -name ".git*" -type d | while read i
 do
