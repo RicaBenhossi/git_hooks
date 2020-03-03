@@ -22,7 +22,7 @@ possui_tags_proibidas(){
 
 
 sigla_dev=$(git config user.sigladev)
-branch=`git branch | grep '^\*' | cut -b3-`
+branch=$(git branch | grep '^\*' | cut -b3-)
 # Tag ou termos que você não quer que existam no código
 lista_tags_proibidas=("DEBUG" "WIP")
 commit_possui_tags_proibidas=false
